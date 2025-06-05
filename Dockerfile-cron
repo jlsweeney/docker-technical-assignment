@@ -1,0 +1,18 @@
+FROM python:3.9
+
+RUN apt-get update && apt-get install -y cron
+
+COPY ./scripts/query_db.py ./
+
+COPY ./cronjob /etc/cron.d/cronjob
+RUN chmod 755 /etc/cron.d/cronjob
+
+COPY ./requirements.txt ./
+RUN pip install -r requirements.txt
+
+RUN crontab /etc/cron.d/cronjob
+
+RUN touch /var/log/cron.log
+RUN chmod 666 /var/log/cron.log
+
+CMD ["cron", "-f"]
